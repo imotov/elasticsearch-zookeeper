@@ -16,7 +16,8 @@
 
 package com.sonian.elasticsearch.zookeeper.discovery.embedded;
 
-import org.apache.zookeeper.server.NIOServerCnxn;
+import org.apache.zookeeper.server.NIOServerCnxnFactory;
+import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog;
 import org.elasticsearch.ElasticsearchException;
@@ -36,7 +37,7 @@ import java.net.InetSocketAddress;
 public class EmbeddedZooKeeperService extends AbstractLifecycleComponent<EmbeddedZooKeeper> implements EmbeddedZooKeeper {
     private ZooKeeperServer zooKeeperServer;
 
-    private NIOServerCnxn.Factory cnxnFactory;
+    private ServerCnxnFactory cnxnFactory;
 
     public EmbeddedZooKeeperService(Settings settings, Environment environment) {
         super(settings);
@@ -54,7 +55,7 @@ public class EmbeddedZooKeeperService extends AbstractLifecycleComponent<Embedde
             for (int port : portsRange.ports()) {
                 InetSocketAddress address = new InetSocketAddress(port);
                 try {
-                    cnxnFactory = new NIOServerCnxn.Factory(address, -1);
+                    cnxnFactory = NIOServerCnxnFactory.createFactory(address, -1);
                     zooKeeperServer.setServerCnxnFactory(cnxnFactory);
                     break;
                 } catch (BindException bindException) {
